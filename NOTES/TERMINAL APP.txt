@@ -1,0 +1,23 @@
+You need to navigate to the project folder first! The # lines are just comments - don't copy those.
+Here's what to do:
+
+powershell
+
+type this on its own to run prog:
+npm run dev
+
+directory:
+cd Desktop\k11-payment-app-2
+
+
+
+
+
+
+
+
+Or the full path:
+powershell
+
+cd C:\Users\alecb\Desktop\k11-payment-app-2
+npm start
