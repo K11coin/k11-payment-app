@@ -11,41 +11,18 @@ import { useGLTF, PerspectiveCamera } from '@react-three/drei';
 import TermsPage from './components/TermsPage';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
-// Detect mobile devices
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-// 3D Coin Component
-function CoinModel() {
-  const { scene } = useGLTF('/models/coin_animation.glb');
-  const meshRef = useRef();
-
-  React.useEffect(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.set(Math.PI / 2, Math.PI / 2, 0);
-      
-      const animate = () => {
-        if (meshRef.current) {
-          meshRef.current.rotation.z += 0.03;
-        }
-        requestAnimationFrame(animate);
-      };
-      animate();
-    }
-  }, []);
-
-  return <primitive ref={meshRef} object={scene} scale={2} position={[0, 0, 0]} />;
-}
-
 // Custom Connect Button with Mobile Support
 function ConnectButton() {
-  const { connected, publicKey } = useWallet();
+  const { connected } = useWallet();
 
   if (isMobile && !connected) {
     return (
       <button
         onClick={() => {
           const dappUrl = window.location.href;
-          const url = `https://phantom.app/ul/browse/${encodeURIComponent(dappUrl)}?ref=${encodeURIComponent(dappUrl)}`;
+          const url =
+            "https://phantom.app/ul/browse?url=" +
+            encodeURIComponent(dappUrl);
           window.location.href = url;
         }}
         className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm md:text-base hover:from-purple-700 hover:to-blue-700 transition-colors"
@@ -55,7 +32,9 @@ function ConnectButton() {
     );
   }
 
-  return <WalletMultiButton className="!bg-gradient-to-r !from-purple-600 !to-blue-600 !text-sm md:!text-base" />;
+  return (
+    <WalletMultiButton className="!bg-gradient-to-r !from-purple-600 !to-blue-600 !text-sm md:!text-base" />
+  );
 }
 
 // Main App Component
@@ -353,9 +332,11 @@ function K11PaymentApp() {
                 <h3 className="text-xl md:text-2xl font-bold mb-4">Connect Your Wallet</h3>
                {isMobile ? (
   <button
-    onClick={() =>
-      window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent("https://k11-payment-app.vercel.app")}`
-    }
+    onClick={() => {
+      window.location.href =
+        "https://phantom.app/ul/browse?url=" +
+        encodeURIComponent("https://www.k11pay.com");
+    }}
     className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-6"
   >
     Open in Phantom
@@ -426,49 +407,54 @@ function K11PaymentApp() {
               Purchaser Portal
             </h2>
 
-            {!connected ? (
-              <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg text-center">
-                <Wallet className="w-16 h-16 md:w-20 md:h-20 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-xl md:text-2xl font-bold mb-4">Connect Your Wallet</h3>
-                {isMobile ? (
-  <button
-    onClick={() =>
-      window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent("https://k11-payment-app.vercel.app")}`
-    }
-    className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-6"
-  >
-    Open in Phantom
-  </button>
-) : (
-  <p className="text-gray-600 mb-6">
-    Click 'Select Wallet' above to connect and make payments
-  </p>
-)}
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="bg-green-50 border-2 border-green-200 p-4 rounded-lg">
-                  <p className="text-green-800 font-semibold break-all">✓ Wallet Connected: {publicKey.toString().substring(0, 20)}...</p>
-                </div>
+{!connected ? (
+  <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg text-center">
+    <Wallet className="w-16 h-16 md:w-20 md:h-20 text-blue-600 mx-auto mb-4" />
+    <h3 className="text-xl md:text-2xl font-bold mb-4">Connect Your Wallet</h3>
 
-                <div className="bg-white p-6 rounded-xl shadow-lg">
-                  <h3 className="text-xl font-bold mb-4">Scan Vendor QR Code</h3>
-                  
-                  {scannerActive ? (
-                    <div className="bg-gray-900 p-12 rounded-lg text-center mb-4">
-                      <Camera className="w-20 h-20 text-white mx-auto mb-4 animate-pulse" />
-                      <p className="text-white">Scanning...</p>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={simulateQRScan}
-                      className="w-full bg-blue-50 border-2 border-dashed border-blue-300 p-12 rounded-lg text-center mb-4 hover:bg-blue-100 transition-colors"
-                    >
-                      <QrCode className="w-20 h-20 text-blue-600 mx-auto mb-4" />
-                      <p className="text-gray-600">Tap to scan QR code</p>
-                      <p className="text-sm text-gray-500 mt-2">(Demo: Auto-fills payment)</p>
-                    </button>
-                  )}
+    {isMobile ? (
+      <button
+        onClick={() => {
+          window.location.href =
+            "https://phantom.app/ul/browse?url=" +
+            encodeURIComponent("https://www.k11pay.com");
+        }}
+        className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-6"
+      >
+        Open in Phantom
+      </button>
+    ) : (
+      <p className="text-gray-600 mb-6">
+        Click 'Select Wallet' above to connect and make payments
+      </p>
+    )}
+  </div>
+) : (
+  <div className="space-y-6">
+    <div className="bg-green-50 border-2 border-green-200 p-4 rounded-lg">
+      <p className="text-green-800 font-semibold break-all">
+        ✓ Wallet Connected: {publicKey.toString().substring(0, 20)}...
+      </p>
+    </div>
+
+    <div className="bg-white p-6 rounded-xl shadow-lg">
+      <h3 className="text-xl font-bold mb-4">Scan Vendor QR Code</h3>
+
+      {scannerActive ? (
+        <div className="bg-gray-900 p-12 rounded-lg text-center mb-4">
+          <Camera className="w-20 h-20 text-white mx-auto mb-4 animate-pulse" />
+          <p className="text-white">Scanning...</p>
+        </div>
+      ) : (
+        <button
+          onClick={simulateQRScan}
+          className="w-full bg-blue-50 border-2 border-dashed border-blue-300 p-12 rounded-lg text-center mb-4 hover:bg-blue-100 transition-colors"
+        >
+          <QrCode className="w-20 h-20 text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Tap to scan QR code</p>
+          <p className="text-sm text-gray-500 mt-2">(Demo: Auto-fills payment)</p>
+        </button>
+      )}
                   
                   <div className="border-t-2 pt-4">
                     <p className="text-sm text-gray-600 mb-3">Or enter payment details manually:</p>
