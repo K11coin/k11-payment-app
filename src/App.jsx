@@ -11,6 +11,9 @@ import { useGLTF, PerspectiveCamera } from '@react-three/drei';
 import TermsPage from './components/TermsPage';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
+// Detect mobile devices
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 // 3D Coin Component
 function CoinModel() {
   const { scene } = useGLTF('/models/coin_animation.glb');
@@ -33,6 +36,28 @@ function CoinModel() {
   return <primitive ref={meshRef} object={scene} scale={2} position={[0, 0, 0]} />;
 }
 
+// Custom Connect Button with Mobile Support
+function ConnectButton() {
+  const { connected, publicKey } = useWallet();
+
+  if (isMobile && !connected) {
+    return (
+      <button
+        onClick={() => {
+          const dappUrl = window.location.href;
+          const url = `https://phantom.app/ul/browse/${encodeURIComponent(dappUrl)}?ref=${encodeURIComponent(dappUrl)}`;
+          window.location.href = url;
+        }}
+        className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm md:text-base hover:from-purple-700 hover:to-blue-700 transition-colors"
+      >
+        Open in Phantom
+      </button>
+    );
+  }
+
+  return <WalletMultiButton className="!bg-gradient-to-r !from-purple-600 !to-blue-600 !text-sm md:!text-base" />;
+}
+
 // Main App Component
 function K11PaymentApp() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -49,7 +74,6 @@ function K11PaymentApp() {
   const { publicKey, connected, sendTransaction } = useWallet();
   const connection = new Connection('https://api.devnet.solana.com');
 
-  // Load transactions from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('k11_transactions');
     if (saved) {
@@ -57,7 +81,6 @@ function K11PaymentApp() {
     }
   }, []);
 
-  // Save transactions to localStorage
   const saveTransaction = (tx) => {
     const updated = [tx, ...transactions].slice(0, 50);
     setTransactions(updated);
@@ -182,6 +205,13 @@ function K11PaymentApp() {
         <source src="/sounds/success-chime.mp3" type="audio/mpeg" />
       </audio>
 
+      {/* Mobile Helper Banner */}
+      {isMobile && !connected && (
+        <div className="bg-purple-600 text-white p-3 text-center text-sm">
+          📱 For best experience, open this site in the Phantom app browser
+        </div>
+      )}
+
       <nav className="bg-white shadow-lg sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -227,7 +257,7 @@ function K11PaymentApp() {
               >
                 <History className="w-5 h-5" />
               </button>
-              <WalletMultiButton className="!bg-gradient-to-r !from-purple-600 !to-blue-600 !text-sm md:!text-base" />
+              <ConnectButton />
             </div>
           </div>
         </div>
@@ -243,6 +273,26 @@ function K11PaymentApp() {
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">K11 Intelligent Payment Service</h2>
               <p className="text-lg md:text-xl text-gray-600 mb-8">Fast, secure cryptocurrency payments on Solana</p>
             </div>
+
+            {isMobile && !connected && (
+              <div className="bg-blue-50 border-2 border-blue-200 p-4 rounded-lg">
+                <p className="text-sm text-blue-800 mb-3">
+                  <strong>📱 Mobile Users:</strong> For the best experience:
+                </p>
+                <ol className="text-sm text-blue-700 space-y-2 ml-4 list-decimal">
+                  <li>Install the Phantom app if you haven't already</li>
+                  <li>Open Phantom and tap the browser icon</li>
+                  <li>Navigate to this page within Phantom's browser</li>
+                  <li>Your wallet will connect automatically</li>
+                </ol>
+                <button
+                  onClick={() => window.open('https://phantom.app/download', '_blank')}
+                  className="mt-3 w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Download Phantom App
+                </button>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <button
@@ -287,14 +337,6 @@ function K11PaymentApp() {
               </div>
             </div>
 
-            <div className="text-center">
-              <button
-                onClick={() => setCurrentPage('terms')}
-                className="text-blue-600 hover:text-blue-800 underline"
-              >
-                View Terms & Conditions
-              </button>
-            </div>
           </div>
         )}
 
@@ -309,7 +351,11 @@ function K11PaymentApp() {
               <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg text-center">
                 <Wallet className="w-16 h-16 md:w-20 md:h-20 text-purple-600 mx-auto mb-4" />
                 <h3 className="text-xl md:text-2xl font-bold mb-4">Connect Your Wallet</h3>
-                <p className="text-gray-600 mb-6">Click "Select Wallet" above to connect and start accepting payments</p>
+                <p className="text-gray-600 mb-6">
+                  {isMobile 
+                    ? "Tap 'Open in Phantom' above to connect your wallet" 
+                    : "Click 'Select Wallet' above to connect and start accepting payments"}
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
@@ -375,7 +421,11 @@ function K11PaymentApp() {
               <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg text-center">
                 <Wallet className="w-16 h-16 md:w-20 md:h-20 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-xl md:text-2xl font-bold mb-4">Connect Your Wallet</h3>
-                <p className="text-gray-600 mb-6">Click "Select Wallet" above to connect and make payments</p>
+                <p className="text-gray-600 mb-6">
+                  {isMobile 
+                    ? "Tap 'Open in Phantom' above to connect your wallet" 
+                    : "Click 'Select Wallet' above to connect and make payments"}
+                </p>
               </div>
             ) : (
               <div className="space-y-6">
