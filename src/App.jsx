@@ -351,11 +351,20 @@ function K11PaymentApp() {
               <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg text-center">
                 <Wallet className="w-16 h-16 md:w-20 md:h-20 text-purple-600 mx-auto mb-4" />
                 <h3 className="text-xl md:text-2xl font-bold mb-4">Connect Your Wallet</h3>
-                <p className="text-gray-600 mb-6">
-                  {isMobile 
-                    ? "Tap 'Open in Phantom' above to connect your wallet" 
-                    : "Click 'Select Wallet' above to connect and start accepting payments"}
-                </p>
+               {isMobile ? (
+  <button
+    onClick={() =>
+      window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent("https://k11-payment-app.vercel.app")}`
+    }
+    className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-6"
+  >
+    Open in Phantom
+  </button>
+) : (
+  <p className="text-gray-600 mb-6">
+    Click 'Select Wallet' above to connect and make payments
+  </p>
+)}
               </div>
             ) : (
               <div className="space-y-6">
@@ -421,11 +430,20 @@ function K11PaymentApp() {
               <div className="bg-white p-6 md:p-8 rounded-xl shadow-lg text-center">
                 <Wallet className="w-16 h-16 md:w-20 md:h-20 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-xl md:text-2xl font-bold mb-4">Connect Your Wallet</h3>
-                <p className="text-gray-600 mb-6">
-                  {isMobile 
-                    ? "Tap 'Open in Phantom' above to connect your wallet" 
-                    : "Click 'Select Wallet' above to connect and make payments"}
-                </p>
+                {isMobile ? (
+  <button
+    onClick={() =>
+      window.location.href = `https://phantom.app/ul/browse/${encodeURIComponent("https://k11-payment-app.vercel.app")}`
+    }
+    className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-6"
+  >
+    Open in Phantom
+  </button>
+) : (
+  <p className="text-gray-600 mb-6">
+    Click 'Select Wallet' above to connect and make payments
+  </p>
+)}
               </div>
             ) : (
               <div className="space-y-6">
